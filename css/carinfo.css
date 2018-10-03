@@ -1,0 +1,58 @@
+.top-header--carinfo,
+.top-header--carinfo a {
+  background-color: transparent;
+  color: black;
+}
+.carinfo__header {
+  padding: 10px 15px;
+}
+.carinfo__header .carinfo__header-header {
+  background-color: white;
+  text-align: center;
+  font-size: 35px;
+  position: relative;
+  border-bottom: 1px solid #ebebeb;
+  padding: 10px 15px;
+}
+.carinfo__header-header h3 {
+  margin-bottom: 10px;
+}
+.carinfo__header-container .carinfo__header-container_item {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+.carinfo__header-container_item h4 {
+  margin-right: 10px;
+}
+
+.carinfo .carinfo__container {
+  border-top: 10px solid #d8d8d8;
+}
+
+.carinfo__container .carinfo__container-main {
+  margin-top: 5px;
+  padding: 10px 15px;
+}
+.carinfo__container-main .carinfo__container-user {
+  margin-bottom: 10px;
+}
+
+.tab-bar-carinfo {
+  background-color: #4374d9;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  display: flex;
+}
+
+.carinfo__container-action {
+  font-size: 30px;
+  color: white;
+  text-decoration: none;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
