@@ -1,0 +1,62 @@
+.input__design {
+  display: block;
+  width: 100%;
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #555;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -webkit-transition: border-color ease-in-out 0.15s,
+    -webkit-box-shadow ease-in-out 0.15s;
+  -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+  transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+  margin-top: 10px;
+}
+.input__design {
+  border-color: #66afe9;
+  outline: 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
+    0 0 8px rgba(102, 175, 233, 0.6);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075),
+    0 0 8px rgba(102, 175, 233, 0.6);
+}
+.input__design::-moz-placeholder {
+  color: #999;
+  opacity: 1;
+}
+.input__design:-ms-input-placeholder {
+  color: #999;
+}
+.input__design::-webkit-input-placeholder {
+  color: #999;
+}
+.input__design::-ms-expand {
+  background-color: transparent;
+  border: 0;
+}
+.input__design[disabled],
+.input__design[readonly],
+fieldset[disabled] .input__design {
+  background-color: #eee;
+  opacity: 1;
+}
+.input__design[disabled],
+fieldset[disabled] .input__design {
+  cursor: not-allowed;
+}
+textarea.input__design {
+  height: auto;
+}
+
+.register__header-header .register__label {
+  align-items: center;
+}
+/* .carinfo__container-text .input__design {
+  height: 100%;
+} */

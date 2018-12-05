@@ -12,7 +12,7 @@
 }
 
 .home__header i {
-  color: #4374D9;
+  color: #4374d9;
 }
 
 .home__header .home-header__column {
@@ -35,7 +35,6 @@
   font-size: 12px;
   color: #b4b4b4;
 }
-
 
 .home .home__carpool-board {
   margin-bottom: 10px;
@@ -80,21 +79,57 @@
 }
 
 .carpool-board__postings {
-  display: flex;
+  /* display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: space-between; */
+  border-top: 1px solid #ebebeb;
 }
 
 .carpool-board__postings .carpool-board__posting {
-  margin-bottom: 30px;
+  padding: 10px;
+
+  border-bottom: 1px solid #ebebeb;
 }
 
-.carpool-board__posting i {
+.carpool-board__posting .posting__content i {
+  width: 30px;
   margin-right: 20px;
 }
 
+.carpool-board__postings .carpool-board__posting a {
+  display: flex;
+  justify-content: space-between;
+  text-decoration: none;
+  color: inherit;
+}
+
+.carpool-board__posting .posting__content {
+  display: flex;
+  align-items: flex-start;
+}
+
+.posting__preview .carpool-board__posting-title {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.posting__preview .carpool-board__posting-destination {
+  color: #b4b4b4;
+  font-size: 11px;
+}
+
+.carpool-board__posting .posting__date-time {
+  font-size: 10px;
+  color: #b4b4b4;
+}
+
 .carpool-board__posting .carpool-board__posting-title {
-  font-size: 13px;
+  font-size: 15px;
+}
+.carpool-board__posting .carpool-board__posting-destination {
+  font-size: 12px;
+
+  justify-content: space-between;
 }
 
 .more__links {

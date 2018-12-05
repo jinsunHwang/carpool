@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+	integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="css/style.css">
+	<title>carinfo</title>
+</head>
+<body>
+	<header class="top-header top-header--carinfo">
+		<div class="header__top">
+		</div>
+		<div class="header__bottom">
+			<div class="header__column">
+				<a href="main.jsp">
+					<i class="fa fa-chevron-left fa-lg"></i>
+				</a>
+			</div>
+			<div class="header__column">
+			</div>
+			<div class="header__column">
+			</div>
+		</div>
+	</header>
+	<main class="carinfo">
+    <form role="form" action="/mainpage/register" method="post">
+  		<header class="carinfo__header">
+  			<header class="register__header-header">
+  				<label class="register__label">제목</label>
+          <input class="input__design" type="text" name="title" placeholder="제목을 입력하세요">
+  			</header>
+  			<div class="carinfo__header-container">
+  				<div class="carinfo__header-container_item">
+  					<label class="carinfo__item-title">목적지</label>
+  					<input class="input__design" type="text" name="destination" placeholder="ex) 청솔->창조관">
+  				</div>
+  				<div class="carinfo__header-container_item">
+  					<label class="carinfo__item-title">만날시간</label>
+  					<input class="input__design" type="text" name="meet"  placeholder="ex) 00:00 으로 입력해주세요">
+  				</div>
+  			</div>
+  		</header>
+  		<section class="carinfo__container">
+        <div class="carinfo__container-main">
+          <div class="carinfo__container-user">
+    				<span class="carinfo__container-id">ID : </span>
+            <span class="carinfo__container__id">??? </span>
+    			</div>
+    			<div class="carinfo__container-text">
+    				<textarea class="input__design" name="name" rows="10"style="width:100%;" placeholder="추가사항 입력"></textarea>
+    			</div>
+        </div>
+  		</section>
+    </form>
+    <nav class="tab-bar-carinfo">
+      <a href="#" class="carinfo__container-action">
+        <span class="carinfo__container-actions">
+            등록하기
+        </span>
+      </a>
+    </nav>
+	</main>
+
+</body>
+</html>
