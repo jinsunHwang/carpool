@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+	integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/usercss.css">
+  <link rel="stylesheet" href="css/bootstrap.css">
+	<title>Friend</title>
+</head>
+<body>
+  <header class="top-header">
+		<div class="header__top">
+		</div>
+		<div class="header__bottom">
+			<div class="header__column">
+
+			</div>
+			<div class="header__column">
+				<span class="header__text">Carpool</span>
+			</div>
+			<div class="header__column">
+
+			</div>
+		</div>
+	</header>
+	<main class="friends">
+    <section class="friends__section">
+      <header class="friends__section-header">
+        <h6 class="friends__section-title">회원가입</h6>
+      </header>
+      <form name=form method="post">
+        <input type=hidden name="action" value="insert2">
+        <table class="table table-bordered table-hover" style="text-align:cneter; boder:1px solid #dddddd">
+          <tbody>
+    					<tr>
+    						<td style="width:110px;"><h5>아이디</h5></td>
+    						<td><input class="form-control" type="text" id="uid" name="uid" maxLength="20" placeholder="아이디를 입력해주세요."></td>
+    						<td style="width:110px;">
+    							<button class="btn btn-primary" onClick="registerCheckFunction()" type="button">중복체크</button>
+    						</td>
+    					</tr>
+    					<tr>
+    						<td style="width:110px;"><h5>비밀번호</h5></td>
+    						<td colspan="2"><input class="form-control" type="password" onkeyup="passwordCheckFunction();" id="upw" name="upw" maxLength="20" placeholder="비밀번호를 입력해주세요."></td>
+    					</tr>
+    					<tr>
+    						<td style="width:110px;"><h5>이름</h5></td>
+    						<td colspan="2"><input class="form-control" type="text" id="uname" name="uname" maxLength="20" placeholder="이름을 입력해주세요."></td>
+    					</tr>
+    					<tr>
+    						<td style="width:110px;"><h5>휴대폰</h5></td>
+    						<td colspan="2"><input class="form-control" type="text" id="uphone" name="uphone" maxLength="20" placeholder="휴대폰번호를 입력해주세요. '-'없이 "></td>
+    					</tr>
+    					<tr>
+    						<td style="text-align:left" colspan="3"><h5 style="color: red" id="passwordCheckMessage"></h5><input class="btn btn-primary pull-right" type="submit" value="회원가입"></td>
+    					</tr>
+    				</tbody>
+          </table>
+        </form>
+    </section>
+	</main>
+
+  </body>
+</html>
