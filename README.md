@@ -1,7 +1,1 @@
-# carpool
-carpool html css
-for(Map<String,Object> cancelItem : cancelItems) {
-      String orderNumber = (String) cancelItem.get('orderNumber');
-      Decimal orderSEQ =(Decimal) cancelItem.get('orderSEQ');
-      System.debug('orderSEQ ::'+orderNumber);
-}
+Upsert failed. First exception on row 0; first error: UNABLE_TO_LOCK_ROW, unable to obtain exclusive access to this record or 1 records: 1316D000000fpWjQAI: []
