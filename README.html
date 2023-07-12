@@ -2,6 +2,7 @@
 <lightning:overlayLibrary aura:id="overlayLib" />
 
 handleUploadFinished : function(component,event,helper) {
+
         let modalBody;
         let modalFooter;
         let bodyContent = '기존 데이터를 덮어씌우겠습니까?';
@@ -10,7 +11,6 @@ handleUploadFinished : function(component,event,helper) {
                 ["lightning:button", {
                     "variant": "brand",
                     "label": "확인",
-                    "onclick": component.getReference("c.handleConfirm")
                 }]
             ],
             function(components, status){
