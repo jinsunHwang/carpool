@@ -2,7 +2,8 @@
 <lightning:overlayLibrary aura:id="overlayLib" />
 
 handleUploadFinished : function(component,event,helper) {
-
+        let uploadedFiles = event.getSource().get("v.files");
+        let listExcel = helper._parse(component.get('v.listExcel'));
         let modalBody;
         let modalFooter;
         let bodyContent = '기존 데이터를 덮어씌우겠습니까?';
@@ -27,10 +28,7 @@ handleUploadFinished : function(component,event,helper) {
     },
 
     handleConfirm : function(component, event, helper) {
-        component.find('overlayLib').notifyClose();
     },
-
-
 
 
 
