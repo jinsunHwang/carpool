@@ -21,21 +21,14 @@ handleUploadFinished : function(component,event,helper) {
                         body: modalBody,
                         footer: modalFooter,
                         showCloseButton: true,
-                    })    .then(function(overlayEvent) {
-                        component.overlayEvent = overlayEvent;
-                    });
+                    })
                 }
             });
     },
+
     handleConfirm : function(component, event, helper) {
-        console.log("Confirm button clicked.");
-        if (component.overlayEvent) {
-            component.overlayEvent.close();
-        }
+        component.find('overlayLib').notifyClose();
     },
-
-
-
 
 
 
