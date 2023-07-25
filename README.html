@@ -111,7 +111,16 @@ Mon Jul 10 2023 00:00:00 GMT+0900 (한국 표준시)
 
 
 
-        select * from test where name in ('a','b','c,') and id in ('c','d','e')
-랑
-select * from test where (name='a' and id='c') or (name='b' and id='d') or (name='c' and id='e') 
-랑 같니?
+
+if(pageReference.attributes.componentName != undefined){
+            setTimeout(function() {
+                helper.onClickUncollected(component, event, helper);
+            }, 1);
+            setTimeout(function() {
+                
+                component.set('v.mapSearchParam.unCollect','N');
+                component.set('v.mapSearchParam.smNumber', pageReference.state.c__smNumber);
+                helper.searchUncollected_wijmo(component, event, helper);
+            }, 2);
+        }
+        
