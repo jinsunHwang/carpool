@@ -133,4 +133,39 @@ if(pageReference.attributes.componentName != undefined){
             const worksheet = workbook.Sheets[worksheetName];
             let listExcel = XLSX.utils.sheet_to_json(worksheet,{raw: true});
         };
-        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Map<String,Object> test = (Map<String,Object>) JSON.deserializeUntyped('{"RecordType_DeveloperName":"COLLECT","SourceLocation_RecordType":"Center","SourceLocationId":"1316D000000iejwQAA","SourceLocation":{"Id":"1316D000000iejwQAA","Name":"동대문서비스센터","DEPT_CODE__c":"PH0006","RecordTypeId":"0126D000002rQ4wQAE","RecordType":{"Id":"0126D000002rQ4wQAE","DeveloperName":"Center"},"SM_DEPT_Id__c":"a0q6D000002bRPxQAM","SM_DEPT_Id__r":{"Id":"a0q6D000002bRPxQAM","GERP_CODE__c":"PH0006"}},"DestinationLocationId":"1316D000000iejyQAA","mainKey":"PH0006^1^A^^CNZ","fm_ENDP_Code__c":"CNZ","RSV_Department_Code__c":"CNZ","ShipmentType__c":"A","SHIPPED_Department_LocationId__c":"1316D000000iejwQAA","SHIPPED_Department_Code__c":"PH0006","Return_Order_Line_Item_Id__c":"0Sn6D0000004Ly0SAE","Product2_Id__c":"01t6D00000LKnjPQAT","partQty":1,"releaseQty":1,"workOrderId":"0WO6D000000fjvrWAA"}');
+List<Map<String,Object>> listTest = new List<Map<String,Object>>();
+listTest.add(test);
+System.debug('test :: '+ test);
+Object testObj = (Object)listTest[0];
+String testStr = JSON.serialize(testObj);
+System.debug('testStr ::'+testStr);
+List<Object> testList = new List<Object>();
+testList.add(testObj);
+
+
+String testListStr = JSON.serialize(testList);
+List<Map<String,Object>> listmap = (List<Map<String,Object>>)JSON.deserializeUntyped(testListStr);
+System.debug('lstmap ::'+listmap);
+이렇게 첬더니
+
+        Error on line 13, column 1: System.TypeException: Invalid conversion from runtime type List<ANY> to List<Map<String,ANY>>
+AnonymousBlock: line 13, column 1 
+                이런 애러가떠
