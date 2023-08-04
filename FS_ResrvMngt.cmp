@@ -1,0 +1,383 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes"
+                access="global"
+                controller="FS_ResrvMngtController"
+                description="ResrvManagement" >
+
+    <lightning:workspaceAPI aura:id="WS_ResrvMngt" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.fnInit}"/>
+
+    <!-- 팝업을 열기위한 overlayLib -->
+    <lightning:overlayLibrary aura:id="overlayLib" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false"/>
+    <aura:attribute name="isShowedFilter" type="Boolean" default="true"/>
+    <aura:attribute name="searchStartDate" type="date" description=""/>
+    <aura:attribute name="searchEndDate" type="date" description=""/>
+
+    <!-- User Setting -->
+    <aura:attribute name="userDeptCode" type="String" default="" description="로그인한 사용자의 소속 부서 코드"/>
+    <aura:attribute name="userDeptType" type="String" default="" description="로그인한 사용자의 소속 센터 부서 유형"/>
+    <aura:attribute name="userCenterId" type="Id" default="" description="로그인한 사용자의 소속 센터 ID"/>
+    <aura:attribute name="userCenterCode" type="String" default="" description="로그인한 사용자의 소속 센터 Code"/>
+    <aura:attribute name="userCenterName" type="String" default="" description="로그인한 사용자의 소속 센터 이름"/>
+    <aura:attribute name="userSMName" type="String" default="" description="로그인한 SM의 이름"/>
+    <aura:attribute name="userSMcode" type="String" default="" description="로그인한 SM의 Code"/>
+    <aura:attribute name="userSettingforSM" type="String" default="" description="로그인한 SM의 검색조건 Setting"/>
+    <aura:attribute name="userPermissionInfo" type="Object" description=""/>
+    <aura:attribute name="condition" type="String" description="조회조건"/>
+
+    <aura:attribute name="mapSettingValue"     type="Map"    default="{}" description="화면 조회조건에 세팅될 값 (Origin과는 별개)" />
+    <aura:attribute name="mapSettingValueOrigin" type="Map"  default="{}" description="화면에 조회조건 세팅값을 위한 세팅데이터 원본(Init시에 가져오고 변경하지 않을 것." />
+    <aura:attribute name="mapSearchParam"      type="Map"    default="{}"  />
+
+    <aura:attribute name="listPRLI" type="List" default="[]" description="ProductRequestLineItem Data List"/>
+    <aura:attribute name="listDetail" type="List" default="" description="Detail Data List"/>
+
+
+    <aura:attribute name="selectedGrid" type="List" default="[]" description="selectedGrid List"/>
+    <aura:attribute name="rowItem" type="List" default="[]" description="Detail Data List"/>
+    <aura:attribute name="cancelItems" type="List" default="[]" description="Detail Data List"/>
+    <aura:attribute name="rentItems" type="List" default="[]" description="Detail Data List"/>
+    <aura:attribute name="columns" type="List" default="[]" description="Columns List"/>
+    <aura:attribute name="detailcolumns" type="List" default="[]" description="Columns List"/>
+    <aura:attribute name="SMList"     type="Map"    default="{}" description="화면 조회조건에 세팅될 값 (Origin과는 별개)" />
+
+    <aura:attribute name="ifAll" type="boolean" description="" default="true"/>
+    <aura:attribute name="ifCustomer" type="boolean" description="" default="false"/>
+    <aura:attribute name="ifCenter" type="boolean" description="" default="false"/>
+    <aura:attribute name="ifSM" type="boolean" description="" default="false"/>
+    <aura:attribute name="ifNotCompleted" type="boolean" description="" default="true"/>
+    <aura:attribute name="ifPartCompleted" type="boolean" description="" default="false"/>
+    <aura:attribute name="userPermission" type="boolean" description="" default="true"/>
+    <aura:attribute name="isCancel" type="Boolean" default="false"/>
+    <aura:attribute name="isRent" type="Boolean" default="false"/>
+
+    <aura:attribute name="WorkOrderId" type="String"/>
+    <aura:attribute name="prId" type="String"/>
+    <aura:attribute name="searchTarget" type="String"/>
+
+    <!-- Public Model Modal -->
+    <aura:attribute name="modalContent" type="Aura.Component"/>
+
+    <!--slaveGridAccordian-->
+    <aura:attribute name="activeSections" type="List" default="['A','B']" />
+    <aura:attribute name="activeSectionsMessage" type="String" default="" />
+
+    <aura:attribute name="centerList" type="Map" description="" default=""/>
+    <aura:attribute name="listCnt" type="Integer" default="0"/>
+
+    <!-- events -->
+    <aura:registerEvent name="FS_ResrvMngt_evt" type="c:FS_ResrvMngt_evt"/>
+
+    <!-- handler -->
+    <aura:handler name="change" value="{!v.mapSearchParam.centerCode}" action="{!c.handleChange}"/>
+    <aura:handler name="change" value="{!v.searchTarget}" action="{!c.handleTypeChange}"/>
+    <aura:handler name="change" value="{!v.mapSearchParam.tellNo}" action="{!c.handleInputChange}"/>
+
+    <div>
+        <!--Lightning Spinner-->
+        <aura:if isTrue="{!v.showSpinner}">
+            <lightning:spinner variant="brand" alternativeText="Waiting" />
+        </aura:if>
+        <lightning:layout multipleRows="true" class="con">
+            <!-- 신규 조회영역 Start-->
+            <lightning:layoutItem size="12" padding="horizontal-small" class="searchWrap">
+                <div class="topTtl">
+                    <p>예약관리</p>
+                </div>
+                <div class="searchCompsWrap">
+                    <div class="searchTabWrap">
+                        <div class="searchInnerBtn">
+                            <lightning:button aura:id="btnUnProcessed" label="미처리" title="Neutral action" class="searchTab active" onclick="{!c.onClickUnprocessed}"/>
+                            <!-- <lightning:button aura:id="btnPartialProcessed" label="부분완료" title="Neutral action" class="searchTab" onclick="{!c.onClickPartialProcessed}"/> -->
+                            <lightning:button aura:id="btnProcessed" label="처리완료" title="Neutral action" class="searchTab" onclick="{!c.onClickProcessed}"/>
+                        </div>
+                        <!--ToggleBtn 검색 영역 접힐때 btnFoldDn로 class 변경-->
+                        <lightning:button aura:id="btnShowFilter" iconName="utility:settings" variant="bare" title="Settings" class="btnFoldup mla" onclick="{!c.fnShowFilter}"/>
+                    </div>
+                    <aura:if isTrue="{!v.isShowedFilter}">
+                        <div class="searchConWrap">
+                            <div class="slds-grid slds-wrap slds-gutters_xx-small searchinner">
+                                <div class="slds-col slds-size_1-of-12 ">
+                                    <lightning:select label="부서" value="{! v.mapSearchParam.deptCode }" variant="label-inline" aura:id="deptSelect" disabled="{!v.userPermission}" onchange="{! c.onChangeDept }">
+                                        <option value="">ALL</option>
+                                        <aura:iteration items="{! v.mapSettingValue.Comm.listMapDEPT }" var="item">
+                                            <option value="{!item.value}">{!item.label}</option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </div>
+                                <div class="slds-col slds-size_1-of-12  ">
+                                    <lightning:select label="센터" value="{! v.mapSearchParam.centerCode }" variant="label-inline" aura:id="centerSelect" disabled="{!v.userPermission}" onchange="{! c.onCenterChange }">
+                                        <option value="">ALL</option>
+                                        <aura:iteration items="{! v.mapSettingValue.Comm.listMapCenter }" var="item">
+                                            <option value="{!item.value}">{!item.label}</option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </div>
+                                <div class="slds-col slds-size_2-of-12 ">
+                                    <!--Period input Start-->
+                                    <ul class="periodWrap">
+                                        <li>
+                                            <lightning:input type="date" name="searchSDate" value="{!v.mapSearchParam.baseDateStart}" label="기준일자"/>
+                                        </li>
+                                        <li>~</li>
+                                        <li>
+                                            <lightning:input type="date" name="searchEDate" value="{!v.mapSearchParam.baseDateEnd}" label="기준일자" variant="label-hidden"/>
+                                        </li>
+                                    </ul>
+                                    <!--Period input End-->
+                                </div>
+
+
+
+                                <div class="slds-col slds-size_1-of-12  ">
+                                    <lightning:select label="창고구분" value="{! v.mapSearchParam.divOrgCode }" aura:id="divOrgCodeSelect" onchange="{! c.onDivOrgCode }">
+                                        <option value="">ALL</option>
+                                        <aura:iteration items="{! v.mapSettingValue.Comm.divOrgCode }" var="item">
+                                            <option value="{!item.value}">{!item.label}</option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </div>
+
+                                <div class="slds-col slds-size_1-of-12  ">
+                                    <lightning:select label="사업부" value="{! v.mapSearchParam.divCode }" aura:id="divSelect" >
+                                        <option value="">ALL</option>
+                                        <aura:iteration items="{! v.mapSettingValue.Comm.divCode }" var="item">
+                                            <option value="{!item.value}">{!item.label}</option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </div>
+                                <div class="slds-col slds-size_1-of-12 ">
+                                    <lightning:input name="searchPartNo" label="PART_NO" value="{!v.mapSearchParam.partNo}"/>
+                                </div>
+                                <div class="slds-col slds-size_1-of-12  ">
+                                    <lightning:select aura:id="selecteItem" name = "selecteItem" value ="{!v.mapSearchParam.resrvStatus}" label="예약상태">
+                                        <option value="ALL" >전체</option>
+                                        <aura:iteration items="{! v.mapSettingValue.Comm.resrvStatus }" var="item">
+                                            <option value="{!item.value}">{!item.label}</option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </div>
+                                <div class="slds-col slds-size_1-of-12  ">
+                                    <lightning:select aura:id="selecteItem" name = "selecteItem" value ="{!v.mapSearchParam.listOrderChannel}" label="주문채널">
+                                        <option value="ALL" >전체</option>
+                                        <aura:iteration items="{! v.mapSettingValue.Comm.listOrderChannel }" var="item">
+                                            <option value="{!item.value}">{!item.label}</option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </div>
+
+                                <div class="slds-col slds-size_1-of-12  ">
+                                    <lightning:select aura:id="selecteItem" name = "selecteItem" value ="{!v.searchTarget}" label="예약대상">
+                                        <option value="" >전체</option>
+                                        <option value="Customer" >고객</option>
+                                        <option value="Center" >지정점</option>
+                                        <option value="SM" >SM</option>
+                                    </lightning:select>
+                                </div>
+
+                                <aura:if isTrue="{!v.ifSM}">
+                                    <div class="slds-col slds-size_1-of-12  ">
+                                        <lightning:select label="SM" value="{! v.mapSearchParam.smCode }" disabled="{!v.userPermission}" aura:id="smSelect" >
+                                            <aura:if isTrue="{! not(v.userPermission) }">
+                                                <option value="">ALL</option>
+                                            </aura:if>
+                                            <aura:iteration items="{! v.SMList.Comm.smCode }" var="item">
+                                                <aura:if isTrue="{!v.userPermission}">
+                                                    <option value="{!item.Id}">{!v.userSettingforSM}</option>
+                                                    <aura:set attribute="else">
+                                                        <option value="{!item.Id}">{!item.Name}[{!item.Id}]</option>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-12 vtalignMT">
+                                        <ul class="checkBoxWrap">
+                                            <li>
+                                                <lightning:input aura:id="checkWorkOrder" type="checkbox" label="접수번호기준"/>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </aura:if>
+
+
+                                <aura:if isTrue="{!v.ifCenter}">
+                                    <div class="slds-col slds-size_1-of-12  ">
+                                        <lightning:select label="지정점" value="{! v.mapSearchParam.designated }">
+                                            <option value="">ALL</option>
+                                            <aura:iteration items="{! v.SMList.Comm.designated }" var="item">
+                                                <option value="{!item.value}">{!item.label}</option>
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </div>
+                                </aura:if>
+                                <aura:if isTrue="{!v.ifCustomer}">
+                                    <div class="slds-col slds-size_1-of-12 ">
+                                        <lightning:input type="text" name="searchEDate" value="{!v.mapSearchParam.tellNo}" label="전화번호" onchange="{!c.handleInputChange}"/>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-12 ">
+                                        <lightning:input type="text" name="searchEDate" value="{!v.mapSearchParam.customerName}" label="고객명"/>
+                                    </div>
+                                </aura:if>
+
+                                <!--체크박스 1개 시작-->
+                                <aura:if isTrue="{!v.ifCustomer}">
+                                    <div class="slds-col slds-size_1-of-12 vtalignMT" style="margin-top:27px;">
+                                        <ul class="checkBoxWrap">
+                                            <li>
+                                                <lightning:input aura:id="checkCIC" type="checkbox" label="CIC/타부서입력건"/>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </aura:if>
+                                <!--체크박스 2개 끝-->
+                                <!--체크박스 1개 시작-->
+                                <!-- <div class="slds-col slds-size_1-of-12 vtalignMT">
+                                    <ul class="checkBoxWrap">
+                                        <li>
+                                            <lightning:input type="checkbox" label="적자" name="input1"/>
+                                        </li>
+                                    </ul>
+                                </div> -->
+                                <!-- <lightning:button aura:id="btnTargetAll" class="custom_margin" title="전체" label="전체" onclick="{!c.onClickAll}"/>
+                                <lightning:button aura:id="btnTargetCustomer" class="custom_margin" title="고객" label="고객" onclick="{!c.onClickCustomer}" />
+                                <lightning:button aura:id="btnTargetCenter" class="custom_margin" title="지정점" label="지정점" onclick="{!c.onClickCenter}"/>
+                                <lightning:button aura:id="btnTargetSM" class="custom_margin" title="SM" label="SM" onclick="{!c.onClickSM}"/> -->
+                                <!--체크박스 1개 끝-->
+                                <!-- <div class="slds-col slds-size_1-of-12">1</div>
+                                <div class="slds-col slds-size_1-of-12">1</div>
+                                <div class="slds-col slds-size_1-of-12">1</div> -->
+                            </div>
+                            <div class="searchBtnWrap">
+                                <lightning:button label="조회" onclick="{!c.fnSearch}" iconName="utility:search" iconPosition="left" />
+                            </div>
+                        </div>
+                    </aura:if>
+                </div>
+            </lightning:layoutItem>
+            <!-- 신규 조회영역 End-->
+
+            <!--신규 그리드 wrap 시작-->
+            <lightning:layoutItem size="12" padding="{!IF(v.isShowedFilter, 'horizontal-small', 'around-small')}">
+                <div class="slds-card_boundary">
+                    <div class="slds-card gridWrap">
+                        <!--Header wrap Strat-->
+                        <ul class="gridHeaderWrap">
+                            <!--그리드 타이틀-->
+                            <li class="gridHeaderTtl">약속조회</li>
+                            <!--그리드 기능 버튼 wrap-->
+                            <li class="gridHeaderBtnWrap">
+                                <aura:if isTrue="{!v.ifNotCompleted}">
+                                    <lightning:button aura:id="bulkRelease" title="영수증" label="영수증" iconName="utility:save" iconPosition="left" onclick="{!c.fnResrvInfoModalOpen}" />
+                                </aura:if>
+                                <lightning:button aura:id="excelBtn" title="Excel" label="Excel" iconName="doctype:excel" iconPosition="left"
+                                                  onclick="{!c.fnExcelForm}" />
+                                <lightning:button aura:id="listFormBtn" title="리스트" label="리스트" iconName="utility:print" iconPosition="left"
+                                                  onclick="{!c.fnResrvListViewForm}"/>
+                                <lightning:button aura:id="bulkRelease"  title="메시지콜" label="메시지콜" onclick="{!c.fnMessageModalOpen}" />
+                                <!-- <aura:if isTrue="{!v.ifNotCompleted}">
+                                    <lightning:button aura:id="bulkCancel"  title="저장" label="저장" onclick="{!c.fnBulkSave}" />
+                                </aura:if> -->
+                            </li>
+                        </ul>
+                        <!--Header wrap End-->
+                        <!--Grid Wrap Start-->
+                        <div class="gridMaster" style="height: 280px;">
+                            <!--                        <c:fs_ResrvProcessingDatatable-->
+                            <!--                                                        aura:id="table_ResrvProcessing"-->
+                            <!--                                                        columns="{!v.columns}"-->
+                            <!--                                                        listPRLI="{!v.listPRLI}"-->
+                            <!--                                                        onbulksave = "{!c.bulkSave}"-->
+                            <!--                                                        ondbclick ="{!c.resrvDetail}"-->
+                            <!--                                                        onrowaction = "{!c.rowaction}"-->
+                            <!--                                                        ondatachange="{!c.buttonchange}"-->
+                            <!--                                                        onmessagepop = "{!c.openMessageModal}"-->
+                            <!--                                                        onprlichange="{!c.onPRLIChange}"-->
+                            <!--                                                        onresrvinfopop = "{!c.openResrvInfoPop}"-->
+
+                            <!--                                                       />-->
+                            <!-- 위즈모 -->
+                            <aura:if isTrue="{!v.ifNotCompleted}">
+                                <lightning:container class="custom-height_300px" aura:id="jsApp_newUnComplete" src="{!$Resource.FS_ResrvMngtGrid + '/index.html?TabId=newUnComplete'}" onmessage="{!c.handleMessage}"/>
+                            </aura:if>
+                            <aura:if isTrue="{!v.ifPartCompleted}">
+                                <lightning:container class="custom-height_300px" aura:id="jsApp_complete" src="{!$Resource.FS_ResrvMngtGrid + '/index.html?TabId=complete'}" onmessage="{!c.handleMessage}"/>
+                            </aura:if>
+                        </div>
+                        <!--Grid Wrap End-->
+                        <!--저장 버튼 시작-->
+                        <div class="gridMasterBtnWrap">
+                            <!--옵션 버튼 추가 20221122-->
+
+                            <!--옵션 버튼 추가 20221122-->
+                            <!--저장 버튼-->
+                            <div class="slds-p-top_x-small" style="margin-right: auto;">
+                                Total : ({!v.listCnt})건
+                            </div>
+                            <aura:if isTrue="{!v.ifNotCompleted}">
+                                <lightning:button aura:id="btnSave" title="저장" label="저장" iconName="utility:save" iconPosition="left" variant="brand" onclick="{!c.fnBulkSave}"  class="btnSave"/>
+                            </aura:if>
+                        </div>
+                        <!--저장 버튼 끝-->
+
+
+                        <!--SlaveGridTable Start-->
+                        <div class="gridSlave">
+                            <p class="divider"></p>
+                            <div class="gridAccordianWap">
+                                <lightning:accordion
+                                        allowMultipleSectionsOpen="true"
+                                        onsectiontoggle="{! c.handleSectionToggle }"
+                                        activeSectionName="{! v.activeSections }"
+                                >
+                                    <!--그리드 아코디언 옵션 버튼 시작-->
+                                    <lightning:accordionSection name="A" label="공급예정 정보" class="gridHeaderTtl">
+                                        <aura:set attribute="actions">
+                                            <!--Slave Save Btn-->
+                                            <!--                                            <lightning:button aura:id="bulkCancel"  title="공급예정일" label="공급예정일" onclick="{!c.fnOpenSupplyPop}" />-->
+                                            <!--                                            <lightning:button aura:id="bulkCancel"  title="저장" label="저장" onclick="{!c.fnDetailSave}" />-->
+                                        </aura:set>
+                                        <aura:set attribute="body">
+                                            <!--Grid Wrap Start-->
+                                            <div class="gridSlaveInner" style="height: 280px">
+                                                <c:fs_ResrvDetailDatatable
+                                                        aura:id="table_ResrvDetail"
+                                                        columns="{!v.detailcolumns}"
+                                                        listDetail="{!v.listDetail}"
+                                                        ondatachange="{!c.updateDraftValues}"
+                                                        ondetailsave = "{!c.detailSave}"
+                                                        onprlichange="{!c.onPRLIChange}"
+                                                        onsupplydatepop = "{!c.openSupplyPop}"
+
+                                                />
+                                            </div>
+                                            <!--Grid Wrap End-->
+                                        </aura:set>
+                                    </lightning:accordionSection>
+                                    <!--그리드 아코디언 옵션 버튼 끝-->
+                                    <!--그리드 아코디언 미옵션 시작-->
+                                    <!-- <lightning:accordionSection name="B" label="Carton 구성2" class="gridSlaveTable"> -->
+                                    <!--Grid Wrap Start-->
+                                    <!-- <div class="gridSlaveInner" style="height: 280px">
+                                        <lightning:datatable
+                                                keyField="id"
+                                                data="{! v.data }"
+                                                columns="{! v.columns }"
+                                                hideCheckboxColumn="true"/>
+                                    </div> -->
+                                    <!--Grid Wrap End-->
+                                    <!-- </lightning:accordionSection> -->
+                                    <!--그리드 아코디언 미옵션 끝-->
+                                </lightning:accordion>
+                            </div>
+                        </div>
+                        <!--SlaveGridTable End-->
+                    </div>
+                </div>
+            </lightning:layoutItem>
+            <!--신규 그리드 wrap 끝-->
+        </lightning:layout>
+    </div>
+    {!v.modalContent}
+</aura:component>
