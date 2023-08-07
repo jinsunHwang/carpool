@@ -1,4 +1,7 @@
- String strQuery ='';
+public static  String querySlOrderProgressesOrders(Set<String> orderInfos) {
+
+
+        String strQuery ='';
         strQuery +=' SELECT ';
         strQuery +=' Id ';
         strQuery +=' ,Order_Number__c';
@@ -25,3 +28,4 @@
 
         System.debug('slOrder strQuery ::'+strQuery);
         return strQuery;
+    }
