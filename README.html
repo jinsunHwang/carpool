@@ -1,12 +1,58 @@
-Schema.Location destinationLocation = new Schema.Location();
-Schema.Location destinationParentLocation = destinationLocation.ParentLocationId__r != null ?  destinationLocation.ParentLocationId__r : new Schema.Location() ;
-SM_DEPT__c destinationSmDept = destinationLocation.SM_DEPT_Id__r != null ? destinationLocation.SM_DEPT_Id__r : new SM_DEPT__c();
+public void execute(QueueableContext context) {
+        Set<String> workOrderIds = new Set<String>();
+        List<ProductRequestLineItem> productRequestLineItems = new List<ProductRequestLineItem>();
+        Map<String,List<SObject>> requestPo = new Map<String,List<SObject>>();
+        List<SI_REQUEST__c> siRequests = new List<SI_REQUEST__c>();
+        List<SI_POCANCEL__c> siPoCancels = new List<SI_POCANCEL__c>();
+        Map<String,Object> cancelProductItem = new Map<String,Object>();
+        List<ServiceResource> cancelServiceResources = new List<ServiceResource>();
 
+        String errorMessage='';
+        try {
+            // workOrder 변경값이 Completed 인 WorkOrder 추출
+            workOrderIds = completeWorkOrder(workOrders,oldWorkOrderMap);
+            if(workOrderIds.size() > 0) {
+                //workOrder 가 Completed 이며 내센터 예약이 아닌 예약 productRequestLineItem 추출
+                productRequestLineItems = getProductRequestLineItems(FS_ResrvMngtBatchQuery.queryProductRequestLineItem(workOrderIds));
+                System.debug('not release not myCenter ProductRequestLineItem ::'+productRequestLineItems);
 
-System.debug('dest'+destinationSmDept);
-System.debug('dest HIGH_DEPT_CODE__r'+destinationSmDept.HIGH_DEPT_CODE__r);
-SM_DEPT__c destinationHighDept = destinationSmDept.HIGH_DEPT_CODE__r != null ? destinationSmDept.HIGH_DEPT_CODE__r : new SM_DEPT__c();
+                // 취소 productRequestLineItem 없데이트
+                productRequestLineItems = cancelProductRequestLineItems(productRequestLineItems);
+                System.debug('cancelProductRequestLineItems ::'+productRequestLineItems);
+                update productRequestLineItems;
 
-System.debug('destinationHighDept'+destinationSmDept.HIGH_DEPT_CODE__r);
+                Set<String> orderNumbers = FS_ComUtils.setToKeys(productRequestLineItems,'Order_Number__c');
 
-List has no rows for assignment to SObject
+                // 사업부 취소일 경우 프로세스
+                requestPo = cancelSiRequests(orderNumbers,productRequestLineItems);
+                siRequests=requestPo.get('siRequests');
+                System.debug('siRequests ::'+siRequests);
+                upsert siRequests;
+                siPoCancels=requestPo.get('siPoCancels');
+                System.debug('siPoCancels ::'+siPoCancels);
+                upsert siPoCancels;
+
+                // 취소 재고 관리
+                cancelProductItem = cancelSettingProductItem(productRequestLineItems);
+                System.debug('cancelProductItem ::'+cancelProductItem);
+                List<Map<String, Object>> cancelProductItemInfo = (List<Map<String, Object>>) cancelProductItem.get('productItemInfo');
+                System.debug('cancel productItemInfo ::'+cancelProductItemInfo);
+                Map<String, ProductItem> cancelMapProductItemByKey =(Map<String, ProductItem>)cancelProductItem.get('mapProductItemByKey');
+                System.debug('cancel mapProductItemByKey ::'+cancelMapProductItemByKey);
+                Map<String,Object> applyCancel= FS_MaterialUtil.applyProductItem(cancelProductItemInfo,cancelMapProductItemByKey);
+                System.debug('applyCancel ::'+applyCancel);
+                if((Boolean) applyCancel.get('isSuccess') == false) {
+                    errorMessage = (String) applyCancel.get('errMsg')+' ';
+                    throw new AuraHandledException(errorMessage);
+                }
+
+                // sm 차용금액 update
+                cancelServiceResources = cancelServiceResources(productRequestLineItems);
+                System.debug('cancelServiceResources ::'+cancelServiceResources);
+                upsert cancelServiceResources;
+
+            }
+        } catch (Exception e) {
+
+        }
+    }
